@@ -68,7 +68,7 @@ public class WrapperPlayServerSetSlot extends AbstractPacket {
 	 * @return The current Slot
 	 */
 	public int getSlot() {
-		return handle.getIntegers().read(1);
+		return handle.getIntegers().read(2);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class WrapperPlayServerSetSlot extends AbstractPacket {
 	 * @param value - new value.
 	 */
 	public void setSlot(int value) {
-		handle.getIntegers().write(1, value);
+		handle.getIntegers().write(2, value);
 	}
 
 	/**
