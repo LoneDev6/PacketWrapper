@@ -22,21 +22,26 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.ItemSlot;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.server.v1_16_R3.EnumItemSlot;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-public class WrapperPlayServerEntityEquipment extends AbstractPacket {
+import java.util.List;
+
+public class WrapperPlayServerEntityEquipment_1_16 extends WrapperPlayServerEntityEquipment
+{
 	public static final PacketType TYPE =
 			PacketType.Play.Server.ENTITY_EQUIPMENT;
 
-	public WrapperPlayServerEntityEquipment() {
-		super(new PacketContainer(TYPE), TYPE);
-		handle.getModifier().writeDefaults();
+	public WrapperPlayServerEntityEquipment_1_16() {
+		super();
 	}
 
-	public WrapperPlayServerEntityEquipment(PacketContainer packet) {
-		super(packet, TYPE);
+	public WrapperPlayServerEntityEquipment_1_16(PacketContainer packet) {
+		super(packet);
 	}
 
 	/**
@@ -79,14 +84,6 @@ public class WrapperPlayServerEntityEquipment extends AbstractPacket {
 		return getEntity(event.getPlayer().getWorld());
 	}
 
-	public ItemSlot getSlot() {
-		return handle.getItemSlots().read(0);
-	}
-
-	public void setSlot(ItemSlot value) {
-		handle.getItemSlots().write(0, value);
-	}
-
 	/**
 	 * Retrieve Item.
 	 * <p>
@@ -103,7 +100,12 @@ public class WrapperPlayServerEntityEquipment extends AbstractPacket {
 	 * 
 	 * @param value - new value.
 	 */
-	public void setItem(ItemStack value) {
-		handle.getItemModifier().write(0, value);
+	public void setItem(ItemSlot slot, ItemStack value)
+	{
+		final List<Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>>old =
+				(List<Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>>) handle.getModifier().withType(List.class).read(0);
+		old.add(new Pair<>(EnumItemSlot.fromName(slot.name().toLowerCase()), CraftItemStack.asNMSCopy(value)));
+
+		handle.getModifier().withType(List.class).write(0, old);
 	}
 }
